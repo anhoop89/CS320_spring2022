@@ -223,7 +223,7 @@ export function doubleEachRecursive(list: List): List {
 // list. You may use either iteration (loops) or recursion.
 
 // Delete the entire "throw" line below and replace it with your code.
-
+ 
 export function reverse(list: List): List {
   
   if (list == null) {

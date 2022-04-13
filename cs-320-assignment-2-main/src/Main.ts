@@ -437,7 +437,7 @@ export function removeDoubleNegations(tree: AST): AST {
       return {
         tag: "num",
         value: - tree.subtree.value
-      };
+      }; 
       // remove double negation 
       if (tree.subtree.tag == "negate") 
         return removeDoubleNegations(tree.subtree.subtree);
