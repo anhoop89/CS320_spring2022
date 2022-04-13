@@ -432,12 +432,6 @@ export function removeDoubleNegations(tree: AST): AST {
       };
 
     case "negate":
-      // if there is only one negation, the number must keep minus sign.
-      // if (tree.subtree.tag == "num")
-      // return {
-      //   tag: "num",
-      //   value: - tree.subtree.value
-      // }; 
       // remove double negation 
       if (tree.subtree.tag == "negate") 
         return removeDoubleNegations(tree.subtree.subtree);
