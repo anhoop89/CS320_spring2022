@@ -218,6 +218,7 @@ export function interpret(scope: Scope, tree: AST): number {
 // so that it also simplifies expressions like "--1" and "---1" to a single
 // NumLeaf with no NegateNodes.
 export function simplifyNegatedLeaves(tree: AST): AST {
+
   switch (tree.tag) {
     case "plus":
       return {
@@ -236,6 +237,7 @@ export function simplifyNegatedLeaves(tree: AST): AST {
           tag: "num",
           value: - tree.subtree.value
         };
+
       else
         return {
           tag: "negate",
@@ -339,7 +341,40 @@ export function countNameOccurrences(name: string, tree: AST): number {
 // Delete the entire "throw" line below and replace it with your code.
 
 export function substituteAllNames(scope: Scope, tree: AST): AST {
-  throw new Error("unimplemented - this one is your job");
+
+  switch (tree.tag) {
+    case "plus":
+      return {
+        tag: "plus",
+        leftSubtree: substituteAllNames(scope, tree.leftSubtree),
+        rightSubtree: substituteAllNames(scope, tree.rightSubtree)
+      };
+    case "negate":
+      if (tree.subtree.tag == "num")
+        return {
+          tag: "num",
+          value: - tree.subtree.value
+        };
+      else
+        return {
+          tag: "negate",
+          subtree: substituteAllNames(scope,tree.subtree)
+        };  
+
+    case "num":
+      return tree;
+
+    case "name":
+      let check: number =  lookup(tree.name, scope );
+      if ( check !== null) {
+        return {
+          tag: "num", 
+          value: check 
+        };
+      }
+      else
+        return tree;
+  }
 }
 
 // **************
@@ -387,7 +422,38 @@ export function substituteAllNames(scope: Scope, tree: AST): AST {
 // Delete the entire "throw" line below and replace it with your code.
 
 export function removeDoubleNegations(tree: AST): AST {
-  throw new Error("unimplemented - this one is your job");
+ 
+  switch (tree.tag) {
+    case "plus":
+      return {
+        tag: "plus",
+        leftSubtree: removeDoubleNegations(tree.leftSubtree),
+        rightSubtree: removeDoubleNegations(tree.rightSubtree)
+      };
+
+    case "negate":
+      // if there is only one negation, the number must keep minus sign.
+      if (tree.subtree.tag == "num")
+      return {
+        tag: "num",
+        value: - tree.subtree.value
+      };
+      // remove double negation 
+      if (tree.subtree.tag == "negate") 
+        return removeDoubleNegations(tree.subtree.subtree);
+      else 
+        return {
+          tag: "negate",
+          subtree: removeDoubleNegations(tree.subtree)
+        }
+
+
+    case "num":
+      return tree;
+
+    case "name":
+      return tree;
+  }
 }
 
 // **************
