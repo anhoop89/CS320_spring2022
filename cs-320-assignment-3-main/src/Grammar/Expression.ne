@@ -109,19 +109,25 @@ expression1 -> expression1 %dash expression2
 expression1 -> expression2
   {% id %}
 
-
 expression2 -> expression2 %times expression3
   {% postprocessWith(buildTimesNode) %}
+
 
 expression2 -> expression3
   {% id %}
 
-expression3 -> atom 
+expression3 -> expression4 %exponent expression3
+  {% postprocessWith(buildExponentNode) %}
+
+expression3 -> expression4
   {% id %}
 
-expression3 -> %dash expression3
-  {% postprocessWith(buildNegateNode) %}
+expression4 -> atom 
+  {% id %}
 
+
+expression4 -> %dash expression4
+  {% postprocessWith(buildNegateNode) %}
 
 atom -> %parenL expression1 %parenR
   {% postprocessWith(unparenthesize) %}
