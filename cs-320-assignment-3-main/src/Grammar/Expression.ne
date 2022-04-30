@@ -112,7 +112,6 @@ expression1 -> expression2
 expression2 -> expression2 %times expression3
   {% postprocessWith(buildTimesNode) %}
 
-
 expression2 -> expression3
   {% id %}
 
@@ -124,7 +123,6 @@ expression3 -> expression4
 
 expression4 -> atom 
   {% id %}
-
 
 expression4 -> %dash expression4
   {% postprocessWith(buildNegateNode) %}
