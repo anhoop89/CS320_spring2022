@@ -110,14 +110,14 @@ expression1 -> expression2
   {% id %}
 
 
-expression2 -> expression1 %times expression1
+expression2 -> expression2 %times expression3
   {% postprocessWith(buildTimesNode) %}
 
 expression2 -> expression3
   {% id %}
 
-
-expression3 -> atom {% id %}
+expression3 -> atom 
+  {% id %}
 
 expression3 -> %dash expression3
   {% postprocessWith(buildNegateNode) %}
@@ -131,5 +131,6 @@ atom -> number
 
 atom -> %name
   {% postprocessWith(buildNameLeaf) %}
+
 
 @include "./Number.ne"
