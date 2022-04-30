@@ -16,8 +16,6 @@ const lexingRules: Rules = {
   equal: /=/,
   comma: /,/,
 };
-// something is wrong. How can I set up a new rule named Hex ????
-
 
 export const lexer: Lexer = compileLexer(lexingRules);
 
