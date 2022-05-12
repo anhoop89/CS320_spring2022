@@ -101,32 +101,19 @@ export function interpretStmt(
 
       break;
     }
-    //   for (x = 1; x < 10; x = x + 1) { declare y = x; print y; } is valid 
-    //   for (x = 1; x < 10; x = x + 1) print x; is valid
-
-    //   { declare  x = 0; for (x = 1; x < 10; x = x + 1) print x; } will throw a runtime scope error.
-    //   throw new ScopeError("RuntimeScopeError")
-
-    //   { for (x = 1; x < 10; x = x + 1) print x; print x; } is invalid (the second print is outside the loop body). 
-    //   throw new DynamicTypeError("DynamicTypeError");
-
-    //   stmt. (name,initialExpr,condition, update, body)
-
-    // for (x = 1; x < 3; x = x + 1) print x; 
-    // { for (x = 1; x < 3; x = x + 1) print x; print x; }
 
     case "for": {
       const outerScopeVarNames: Set<string> = namesInScope(scope); 
       
       const initialValue: Value = interpretExpr(scope, stmt.initialExpr);
       assertNum(initialValue);
-      for ( declare(stmt.name, initialValue, scope); 
+      for (declare(stmt.name, initialValue, scope); 
            interpretExpr(scope, stmt.condition);
-           interpretStmt(scope, stmt.update) )
+           interpretStmt(scope, stmt.update))
       {
           interpretStmt(scope, stmt.body);
       }  
-      
+
       for (const varName of scope.keys())
         if (!outerScopeVarNames.has(varName)) 
           undeclare(varName, scope);       
