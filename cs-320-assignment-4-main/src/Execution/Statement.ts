@@ -10,7 +10,7 @@ import { exprToString } from "../SyntaxAnalysis"; // used in error messages
 import { printLine } from "../Library/Runtime";
 
 // Some of our statements modify the current scope.
-import { Scope, namesInScope, declare, update, undeclare } from "./Scope";
+import { Scope, namesInScope, declare, update, undeclare, ScopeError } from "./Scope";
 
 // Some of our statements contain expressions.
 import { interpretExpr } from "./Expression";
@@ -54,9 +54,9 @@ export function interpretStmt(
 
     case "assert": {
       const assertValue: Value = interpretExpr(scope, stmt.condition);
-      if ( assertValue === 1 )
+      if (assertValue === 1)
         throw new DynamicTypeError("DynamicTypeError");
-      if ( assertValue == false )
+      if (assertValue == false)
         throw new AssertionError("AssertionError");
       break;
     }
@@ -101,15 +101,28 @@ export function interpretStmt(
 
       break;
     }
- //   for (x = 1; x < 10; x = x + 1) { let y = x; print y; } is valid 
- //   for (x = 1; x < 10; x = x + 1) print x; is valid
- //   { let x = 0; for (x = 1; x < 10; x = x + 1) print x; } will throw a runtime scope error.
- //   { for (x = 1; x < 10; x = x + 1) print x; print x; } is invalid (the second print is outside the loop body). 
+    //   for (x = 1; x < 10; x = x + 1) { let y = x; print y; } is valid 
+    //   for (x = 1; x < 10; x = x + 1) print x; is valid
+
+    //   { let x = 0; for (x = 1; x < 10; x = x + 1) print x; } will throw a runtime scope error.
+    //   throw new ScopeError("RuntimeScopeError")
+
+    //   { for (x = 1; x < 10; x = x + 1) print x; print x; } is invalid (the second print is outside the loop body). 
+    //   throw new DynamicTypeError("DynamicTypeError");
+
+    //   stmt. (name,initialExpr,condition, update, body)
+
     case "for": {
       const outerScopeVarNames: Set<string> = new Set(scope.keys());
+      const initialValue: Value = interpretExpr(scope, stmt.initialExpr);
+      declare(stmt.name, initialValue, scope);
       const conditionValue: Value = interpretExpr(scope, stmt.condition);
-
-      throw new DynamicTypeError("DynamicTypeError");
+      interpretStmt(scope, stmt.update);
+      interpretStmt(scope, stmt.body);
+      for (const varName of scope.keys())
+        if (!outerScopeVarNames.has(varName))
+          undeclare(varName, scope);
+      break;
     }
   }
 }
