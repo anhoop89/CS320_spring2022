@@ -11,6 +11,7 @@
 // as long as we have a Scope mapping from variable names to types.
 
 import { SourceType, Expr, InfixExpr, PrefixExpr, Value } from "../AST";
+import { assertNum } from "../Execution/TypeAssertions";
 import { Scope, lookup } from "./Scope";
 import { assertType } from "./TypeAssertions";
 
@@ -68,7 +69,7 @@ export function inferExprType(scope: Scope, expr: Expr): SourceType {
     // we just have to make sure that both operands are numbers, and then we
     // know that the result is a number.
     case "plus":
-    case "minus":
+    case "minus":  
     case "times":
     case "divide":
     case "exponent":
@@ -119,16 +120,27 @@ export function inferExprType(scope: Scope, expr: Expr): SourceType {
     case "bool":
       return expr.tag;
 
-    case "lessThan":
+    case "lessThan": {
       const leftType = inferExprType(scope, expr.leftSubexpr);
       const rightType = inferExprType(scope, expr.rightSubexpr);
       assertType(leftType, rightType);
       return "bool";
-
+    }
     // This code works, but you'll be modifying it in exercise 2 to be more
     // complete.
-    case "and":
-    case "or":
-      return inferInfixExprType("bool", "bool", scope, expr);
+    case "and": {
+      const leftCheck = inferExprType(scope, expr.leftSubexpr);
+      const rightCheck = inferExprType(scope, expr.rightSubexpr);
+      assertType(leftCheck, rightCheck);
+      if (leftCheck === 'num')
+        return "num";   
+      else if (leftCheck === 'bool')
+        return "bool";
+    }
+    case "or":{
+ 
+      
+        return inferInfixExprType("bool", "bool", scope, expr);
+    }
   }
 }
