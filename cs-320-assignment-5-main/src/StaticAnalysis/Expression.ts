@@ -134,13 +134,15 @@ export function inferExprType(scope: Scope, expr: Expr): SourceType {
       assertType(leftCheck, rightCheck);
       if (leftCheck === 'num')
         return "num";   
-      else if (leftCheck === 'bool')
-        return "bool";
+      return "bool";
     }
     case "or":{
- 
-      
-        return inferInfixExprType("bool", "bool", scope, expr);
+      const leftCheck = inferExprType(scope, expr.leftSubexpr);
+      const rightCheck = inferExprType(scope, expr.rightSubexpr);
+      assertType(leftCheck, rightCheck);
+      if (leftCheck === 'num')
+        return "num";   
+      return "bool";
     }
   }
 }
