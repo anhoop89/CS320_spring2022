@@ -66,7 +66,7 @@ test("switch/case statement test", () => {
     ]),
     defaultCase: null
   });
-
+ 
   expect(scope).toEqual(new Map());
 
   typecheckStmt(scope, {
