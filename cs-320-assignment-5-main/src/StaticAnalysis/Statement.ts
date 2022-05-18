@@ -109,19 +109,27 @@ export function typecheckStmt(scope: Scope, stmt: Stmt): void {
     }
 
     case "switch": {
-
+      const outerScopeVarNames: Set<string> = namesInScope(scope);
       const conditionType = inferExprType(scope, stmt.scrutinee);
+      // assertType("num", conditionType);
+      // assertType("bool", conditionType);
 
       for (const [value, body] of stmt.valueCases.entries()) {
-            // value: Value
-            // body: Stmt
-          }
+        //In typechecking, each case of 
+        //a switch statement must have the same type as the scrutinee.
+        assertType(inferValueType(value), conditionType);
 
-          
-      const outerScopeVarNames: Set<string> = namesInScope(scope);
+        typecheckStmt(scope, body);
+        if (stmt.defaultCase != null)
+          typecheckStmt(scope, stmt.defaultCase);
+        // value: Value
+        // body: Stmt
+      }
+      
+     
       for (const varName of scope.keys())
-      if (!outerScopeVarNames.has(varName))
-        undeclare(varName, scope);
+        if (!outerScopeVarNames.has(varName))
+          undeclare(varName, scope);
 
     }
   }
