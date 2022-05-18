@@ -107,5 +107,22 @@ export function typecheckStmt(scope: Scope, stmt: Stmt): void {
 
       break;
     }
+
+    case "switch": {
+
+      const conditionType = inferExprType(scope, stmt.scrutinee);
+
+      for (const [value, body] of stmt.valueCases.entries()) {
+            // value: Value
+            // body: Stmt
+          }
+
+          
+      const outerScopeVarNames: Set<string> = namesInScope(scope);
+      for (const varName of scope.keys())
+      if (!outerScopeVarNames.has(varName))
+        undeclare(varName, scope);
+
+    }
   }
 }
