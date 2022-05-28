@@ -168,6 +168,10 @@ export class MapFuncScope implements FuncScope {
 //   - The "super" keyword is used to access a superclass's method definition,
 //     like "super.functionsInScope()".
 
+// After you've made your change, you can modify the constructor call in the
+// implementation of newFunctionScope in src/Factories.ts, which will change the
+// behavior of all function scopes in the interpreter.
+
 // ******************
 // * EXERCISE 1 END *
 // ******************
@@ -330,6 +334,10 @@ export class ListVarScopeSpec<Entry> {
 //     If name is in the current scope, update its entry (with .set); if it's
 //     not in the current scope, try each outer scope in order. If it's not
 //     defined in any scope, throw a ScopeError.
+
+// After you've made your change, you can modify the constructor call in the
+// implementation of newEmptyVarScope in src/Factories.ts, which will change the
+// behavior of all function scopes in the interpreter.
 
 
 // Uncomment the code below to get started. You will not need to modify any of

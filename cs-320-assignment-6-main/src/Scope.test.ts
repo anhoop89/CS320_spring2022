@@ -9,13 +9,15 @@ import * as scope from "./Scope";
 import { SourceType } from "./Type";
 
 interface FuncScopeFactory {
-  new(functions: Map<string, Func>): scope.FuncScope;
+  new(functions: ReadonlyMap<string, Func>): scope.FuncScope;
 }
 
 test("DebugMapFuncScope test", () => {
   const DebugMapFuncScope: FuncScopeFactory = (<any> scope).DebugMapFuncScope;
   expect(DebugMapFuncScope).toBeDefined();
   expect(DebugMapFuncScope.prototype).toBeInstanceOf(scope.MapFuncScope);
+
+  jest.spyOn(factories, "newEmptyVarScope").mockImplementation(() => new scope.MapVarScope())
 
   jest.spyOn(runtime, "printLine").mockImplementation(_ => { });
 
@@ -75,7 +77,7 @@ test("ListVarScope test", () => {
     printedLines.push(line.toString())
   });
 
-  jest.spyOn(factories, "newEmptyVarScope").mockImplementation(() => new ListVarScope(new Map(), null))
+  jest.spyOn(factories, "newEmptyVarScope").mockImplementation(() => new ListVarScope())
 
   const testProg = new Prog(
     new scope.MapFuncScope(new Map([
