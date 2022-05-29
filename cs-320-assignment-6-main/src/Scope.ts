@@ -157,7 +157,14 @@ export class MapFuncScope implements FuncScope {
 
 // Each time you call console.log, you must pass **only** the name of the
 // function as the log message, like console.info(name).
-
+export class DebugMapFuncScope extends MapFuncScope {
+  override dispatch(name: string): Func {
+    const func = super.dispatch(name);
+    if (func != null)
+      console.info(name);
+    return func;
+  }
+}
 // This should only take a little bit of code, but you'll have to think a bit
 // about how TypeScript classes work.
 
@@ -343,27 +350,50 @@ export class ListVarScopeSpec<Entry> {
 // Uncomment the code below to get started. You will not need to modify any of
 // this provided code, but you'll need to add your own method implementations.
 
-// export class ListVarScope<Entry> extends ListVarScopeSpec<Entry> implements VarScope<Entry> {
-//   protected override outerScopes: ListVarScope<Entry> | null;
-//
-//   constructor(
-//     top: Map<string, Entry> = new Map(),
-//     rest: ListVarScope<Entry> | null = null
-//   ) {
-//     super(top, rest);
-//     this.currentScope = top;
-//     this.outerScopes = rest;
-//   }
-//
-//   pushNestedScope(): void {
-//     this.outerScopes = new ListVarScope(this.currentScope, this.outerScopes);
-//     this.currentScope = new Map();
-//   }
-//
-//   popNestedScope(): void {
-//     if (this.outerScopes == null)
-//       throw new Error("tried to pop from empty stack");
-//     this.currentScope = this.outerScopes.currentScope;
-//     this.outerScopes = this.outerScopes.outerScopes;
-//   }
-// }
+export class ListVarScope<Entry> extends ListVarScopeSpec<Entry> implements VarScope<Entry> {
+ 
+  protected override outerScopes: ListVarScope<Entry> | null;
+
+  constructor(
+    top: Map<string, Entry> = new Map(),
+    rest: ListVarScope<Entry> | null = null
+  ) {
+    super(top, rest);
+    this.currentScope = top;
+    this.outerScopes = rest;
+  }
+
+  pushNestedScope(): void {
+    this.outerScopes = new ListVarScope(this.currentScope, this.outerScopes);
+    this.currentScope = new Map();
+  }
+
+  popNestedScope(): void {
+    if (this.outerScopes == null)
+      throw new Error("tried to pop from empty stack");
+    this.currentScope = this.outerScopes.currentScope;
+    this.outerScopes = this.outerScopes.outerScopes;
+  }
+
+  lookup(name: string): Entry {
+    let entry = this.currentScope.get(name);
+    if (entry == null){
+      entry = this.outerScopes?.lookup(name); 
+      if (entry == null)
+        throw new ScopeError("name is not in scope: " + name);
+    }
+    return entry;
+  }
+
+  declare(name: string, entry: Entry): void {
+    if (this.currentScope.has(name))
+      throw new ScopeError("declaring duplicate variable name: " + name);
+    this.currentScope.set(name, entry);
+  }
+
+  update(name: string, entry: Entry): void {
+    if (!this.currentScope.has(name))
+      throw new ScopeError("updating undeclared variable name: " + name);
+    this.currentScope.set(name, entry);
+  }
+}
